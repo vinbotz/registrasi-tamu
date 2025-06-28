@@ -1,0 +1,36 @@
+name: Deploy Laravel to Railway
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.2
+          extensions: mbstring, bcmath, pdo, mysql
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Setup .env
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+          echo "DB_CONNECTION=mysql" >> .env
+          echo "DB_HOST=trolley.proxy.rlwy.net" >> .env
+          echo "DB_PORT=33221" >> .env
+          echo "DB_DATABASE=railway" >> .env
+          echo "DB_USERNAME=root" >> .env
+          echo "DB_PASSWORD=FeCjUXSfNoZQhcccjkhklNbrpXVzSDQA" >> .env
+
+      - name: Run Laravel migrations
+        run: php artisan migrate --force
