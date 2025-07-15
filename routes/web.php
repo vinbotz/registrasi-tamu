@@ -25,6 +25,10 @@ Route::get('/admin/login', function () {
     return view('admin.login');
 })->name('admin.login');
 
+Route::get('/login', function () {
+    return redirect()->route('admin.login');
+})->name('login');
+
 Route::post('/admin/login', function (Request $request) {
     $credentials = $request->only('email', 'password');
     if (Auth::attempt($credentials)) {
