@@ -2,8 +2,9 @@ FROM php:8.2-apache
 
 # Install system dependencies & PHP extensions
 RUN apt-get update && apt-get install -y \
-    git curl unzip zip libzip-dev libonig-dev libxml2-dev libpng-dev \
-    && docker-php-ext-install pdo pdo_mysql zip bcmath intl
+    git curl unzip zip libzip-dev libonig-dev libxml2-dev libpng-dev libjpeg-dev libfreetype6-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install pdo pdo_mysql zip bcmath intl gd
 
 # Enable Apache mod_rewrite
 RUN a2enmod rewrite
