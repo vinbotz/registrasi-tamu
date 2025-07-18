@@ -7,8 +7,7 @@
         <link rel="stylesheet" href="/css/webprint.css" />
     </head>
     <body>
-        <a href="/admin/tamu" class="btn-admin">Ke Form Admin</a>
-        <div class="container">
+        <div class="container mt-mobile-3">
             <div class="kop">
                 <img src="img/logo-kiri.png" alt="Logo Kiri" class="logo" />
                 <div class="text-header">
@@ -51,7 +50,6 @@
                         <th>NO TELEPON</th>
                         <th>JABATAN</th>
                         <th>TANDA TANGAN</th>
-                        <th class="no-print">AKSI</th>
                     </tr>
                 </thead>
                 <tbody id="attendanceList">
@@ -73,26 +71,45 @@
                     <input type="text" id="inputAcara" placeholder="Acara" />
                 </div>
 
-                <!-- Baris tombol atas -->
-                <div class="button-baris">
-                    <button class="btn biru" onclick="setInfo()">
-                        Terapkan
-                    </button>
-                    <button class="btn hijau" onclick="addRow()">
-                        Tambah Baris
-                    </button>
-                </div>
-
-                <!-- Baris tombol bawah -->
-                <div class="button-baris">
-                    <button class="btn hijau" onclick="window.print()">
-                        Cetak
-                    </button>
-                    <button class="btn merah" onclick="deleteLastRow()">
-                        Hapus Baris Terakhir
-                    </button>
+                <!-- Baris tombol kiri-kanan -->
+                <div
+                    class="button-baris-row"
+                    style="
+                        display: flex;
+                        justify-content: space-between;
+                        gap: 12px;
+                        flex-wrap: wrap;
+                    "
+                >
+                    <div class="button-baris" style="gap: 8px">
+                        <button class="btn biru" onclick="setInfo()">
+                            Terapkan
+                        </button>
+                        <button class="btn hijau" onclick="addRow()">
+                            Tambah Baris
+                        </button>
+                    </div>
+                    <div class="button-baris" style="gap: 8px">
+                        <button class="btn hijau" onclick="window.print()">
+                            Cetak
+                        </button>
+                        <button class="btn merah" onclick="deleteLastRow()">
+                            Hapus Baris Terakhir
+                        </button>
+                    </div>
                 </div>
             </div>
+        </div>
+        <div
+            class="admin-btn-wrapper"
+            style="
+                display: flex;
+                justify-content: flex-start;
+                margin-top: 16px;
+                margin-bottom: 8px;
+            "
+        >
+            <a href="/admin/tamu" class="btn-admin">Ke Form Admin</a>
         </div>
 
         <!-- Footer -->

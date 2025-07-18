@@ -238,6 +238,72 @@
         }
     }
 
+    @media (max-width: 600px) {
+        body {
+            padding: 8px;
+        }
+        .container {
+            padding: 8px;
+            max-width: 100vw;
+            box-shadow: none;
+        }
+        .kop {
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            text-align: center;
+        }
+        .logo {
+            height: 60px;
+        }
+        .text-header {
+            padding: 0 4px;
+            font-size: 0.95em;
+        }
+        table.info {
+            font-size: 13px;
+        }
+        table.daftar-hadir {
+            font-size: 12px;
+            min-width: 600px;
+        }
+        .overflow-x-auto {
+            overflow-x: auto;
+        }
+        .input-baris {
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+        }
+        .input-baris input {
+            min-width: 0;
+            width: 100%;
+            font-size: 13px;
+        }
+        .no-print.d-flex.gap-2,
+        form[name="bulk-download-form"] {
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: center !important;
+            gap: 8px !important;
+            width: 100%;
+        }
+        .btn, .btn-admin, .tombol-panel button, .button-baris button, .button-baris a, form[name="bulk-download-form"] button, form[name="bulk-download-form"] a {
+            width: auto !important;
+            min-width: 90px;
+            font-size: 14px;
+            padding: 8px 14px;
+        }
+        .button-baris {
+            flex-direction: row !important;
+            gap: 8px !important;
+            width: 100%;
+        }
+        .mb-4.text-right.no-print {
+            text-align: left !important;
+        }
+    }
+
     .footer {
         text-align: center;
         margin-top: 20px;
@@ -257,7 +323,6 @@
                 Tanah Sareal
             </p>
         </div>
-       
     </div>
 
     <hr />
@@ -265,9 +330,18 @@
     <h1 class="text-center font-bold mb-6">Data Tamu</h1>
 
     @if(session('success'))
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-            {{ session('success') }}
-        </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil',
+                    text: @json(session('success')),
+                    confirmButtonText: 'OK',
+                    timer: 2500,
+                    timerProgressBar: true
+                });
+            });
+        </script>
     @endif
 
     <!-- Tombol Menuju Web Print -->
@@ -320,7 +394,7 @@
                                 <a href="{{ route('admin.tamu.edit', $tamu->id) }}" class="btn biru" title="Edit" style="width:90px;height:38px;display:flex;align-items:center;justify-content:center;font-size:14px;padding:0;">
                                     <i class="bi bi-pencil-square"></i> <span style="margin-left:4px;">Edit</span>
                                 </a>
-                                <form action="{{ route('admin.tamu.destroy', $tamu->id) }}" method="POST" onsubmit="return confirm('Yakin mau hapus data ini?');" style="display:flex;align-items:center;">
+                                <form action="{{ route('admin.tamu.destroy', $tamu->id) }}" method="POST" data-delete-form style="display:flex;align-items:center;">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn merah" title="Hapus" style="width:90px;height:38px;display:flex;align-items:center;justify-content:center;font-size:14px;padding:0;">
@@ -382,6 +456,27 @@
                 }
             });
         }
+
+        // SweetAlert2 untuk konfirmasi hapus
+        document.querySelectorAll('form[data-delete-form]').forEach(function(form) {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                Swal.fire({
+                    title: 'Yakin hapus data ini?',
+                    text: 'Data yang dihapus tidak bisa dikembalikan!',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Ya, hapus!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        });
     });
 </script>
 
