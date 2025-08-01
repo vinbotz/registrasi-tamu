@@ -23,21 +23,19 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Bootstrap any application services.
      */
-    public function boot(Request $request): void
-    {
-        // Jalankan default string length hanya jika bukan MongoDB
-        if (DB::getDefaultConnection() !== 'mongodb') {
-            Schema::defaultStringLength(191);
-        }
+   public function boot(Request $request): void
+{
+    // sementara disable schema dulu biar artisan bisa jalan
+    // Schema::defaultStringLength(191);
 
-        if (app()->environment('production')) {
-            URL::forceScheme('https');
-        }
+    if (app()->environment('production')) {
+        URL::forceScheme('https');
+    }
 
-        if (env('APP_MAINTENANCE') === 'true') {
-            if (!$request->is('admin*')) {
-                abort(response()->view('maintenance.maintenance', [], 503));
-            }
+    if (env('APP_MAINTENANCE') === 'true') {
+        if (!$request->is('admin*')) {
+            abort(response()->view('maintenance.maintenance', [], 503));
         }
     }
 }
+
