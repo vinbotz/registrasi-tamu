@@ -1,3 +1,11 @@
+# Stage 1: Install dependencies with Composer
+FROM composer:2 AS vendor
+
+WORKDIR /app
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --optimize-autoloader --prefer-dist --no-progress --no-interaction
+
+# Stage 2: Main PHP + Apache image
 FROM php:8.2-apache
 
 # Install system dependencies & PHP extensions
@@ -14,16 +22,13 @@ RUN a2enmod rewrite
 # Set working directory
 WORKDIR /var/www/html
 
-# Copy project files
+# Copy app files
 COPY . /var/www/html
 
-# Install Composer
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+# Copy vendor from stage 1
+COPY --from=vendor /app/vendor /var/www/html/vendor
 
-# Install PHP dependencies
-RUN composer install --no-dev --optimize-autoloader
-
-# Apache config for Laravel
+# Apache config for Laravel (pointing to /public)
 RUN echo '<VirtualHost *:80>\n\
     DocumentRoot /var/www/html/public\n\
     <Directory /var/www/html/public>\n\
