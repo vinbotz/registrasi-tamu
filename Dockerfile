@@ -17,8 +17,15 @@ WORKDIR /var/www/html
 # Copy Laravel project files
 COPY . /var/www/html
 
-RUN chmod +x /var/www/html/start.sh
+# Apache config for Laravel
+RUN echo '<VirtualHost *:80>\n\
+    DocumentRoot /var/www/html/public\n\
+    <Directory /var/www/html/public>\n\
+        AllowOverride All\n\
+        Require all granted\n\
+    </Directory>\n\
+</VirtualHost>' > /etc/apache2/sites-available/000-default.conf
 
-# Set permissions
+# Permissions
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html
