@@ -14,8 +14,14 @@ RUN a2enmod rewrite
 # Set working directory
 WORKDIR /var/www/html
 
-# Copy Laravel project files
+# Copy project files
 COPY . /var/www/html
+
+# Install Composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+# Install PHP dependencies
+RUN composer install --no-dev --optimize-autoloader
 
 # Apache config for Laravel
 RUN echo '<VirtualHost *:80>\n\
