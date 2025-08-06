@@ -1,0 +1,25 @@
+# Folder vendor & node_modules jangan di-copy (Composer & NPM akan handle di container)
+vendor
+node_modules
+
+# Git files
+.git
+.gitignore
+
+# Docker files
+Dockerfile
+docker-compose.yml
+
+# Laravel cache & logs
+storage/logs
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+
+# Env file (nanti diatur di Northflank Environment/Secrets)
+.env
+
+# Sistem & editor files
+*.log
+*.swp
+*.DS_Store
