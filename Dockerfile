@@ -1,12 +1,20 @@
-# Stage 1: Composer install dependencies
+# Stage 1: Composer install dependencies (pakai cache)
 FROM composer:2 AS vendor
 
 WORKDIR /app
+
+# Copy file composer untuk memanfaatkan cache layer
 COPY composer.json composer.lock ./
 
-# Install semua dependency Laravel
-RUN composer install --no-dev --optimize-autoloader --prefer-dist --no-progress --no-interaction \
-    && composer require mongodb/laravel-mongodb --no-progress --no-interaction
+# Install dependencies (cache layer ini hanya berubah kalau composer.json/lock berubah)
+RUN composer install --no-dev --optimize-autoloader --prefer-dist --no-progress --no-interaction
+
+# Setelah install dasar, copy semua file Laravel
+COPY . /app
+
+# Pastikan autoload terupdate setelah file project masuk
+RUN composer dump-autoload --optimize
+
 
 # Stage 2: PHP + Apache
 FROM php:8.2-apache
@@ -23,7 +31,7 @@ RUN apt-get update && apt-get install -y \
 # Set working directory
 WORKDIR /var/www/html
 
-# Copy project files
+# Copy semua file project (kecuali vendor)
 COPY . /var/www/html
 
 # Copy vendor folder dari stage vendor
