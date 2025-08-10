@@ -1,25 +1,30 @@
-# Stage 1: Composer install dependencies (pakai cache)
+# Stage 1: Composer install dependencies
 FROM composer:2 AS vendor
+
+# Install ekstensi mongodb di stage composer
+RUN apk add --no-cache autoconf g++ make \
+    && pecl install mongodb \
+    && docker-php-ext-enable mongodb
 
 WORKDIR /app
 
-# Copy file composer untuk memanfaatkan cache layer
+# Copy file composer untuk cache
 COPY composer.json composer.lock ./
 
-# Install dependencies (cache layer ini hanya berubah kalau composer.json/lock berubah)
+# Install dependencies Laravel
 RUN composer install --no-dev --optimize-autoloader --prefer-dist --no-progress --no-interaction
 
-# Setelah install dasar, copy semua file Laravel
+# Copy semua source code Laravel
 COPY . /app
 
-# Pastikan autoload terupdate setelah file project masuk
+# Optimalkan autoload
 RUN composer dump-autoload --optimize
 
 
-# Stage 2: PHP + Apache
+# Stage 2: PHP + Apache untuk runtime
 FROM php:8.2-apache
 
-# Install dependencies
+# Install dependencies PHP
 RUN apt-get update && apt-get install -y \
     git curl unzip zip libzip-dev libonig-dev libxml2-dev libpng-dev libjpeg-dev libfreetype6-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
@@ -28,16 +33,15 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-enable mongodb \
     && a2enmod rewrite
 
-# Set working directory
 WORKDIR /var/www/html
 
-# Copy semua file project (kecuali vendor)
+# Copy semua file kecuali vendor
 COPY . /var/www/html
 
-# Copy vendor folder dari stage vendor
+# Copy vendor hasil dari stage composer
 COPY --from=vendor /app/vendor /var/www/html/vendor
 
-# Apache config untuk Laravel (pointing ke /public)
+# Apache config untuk Laravel
 RUN echo '<VirtualHost *:80>\n\
     DocumentRoot /var/www/html/public\n\
     <Directory /var/www/html/public>\n\
