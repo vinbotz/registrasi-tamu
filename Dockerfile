@@ -1,13 +1,12 @@
-# Stage 1: Install PHP dependencies with Composer
+# Stage 1: Composer install dependencies
 FROM composer:2 AS vendor
 
 WORKDIR /app
-
-# Copy composer files only for caching
 COPY composer.json composer.lock ./
 
-# Install dependencies (no dev for production)
-RUN composer install --no-dev --optimize-autoloader --prefer-dist --no-progress --no-interaction
+# Install semua dependency Laravel termasuk laravel-mongodb
+RUN composer require mongodb/laravel-mongodb \
+    && composer install --no-dev --optimize-autoloader --prefer-dist --no-progress --no-interaction
 
 # Stage 2: PHP + Apache
 FROM php:8.2-apache
@@ -18,8 +17,7 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install pdo pdo_mysql zip bcmath intl gd \
     && pecl install mongodb \
-    && docker-php-ext-enable mongodb \
-    && rm -rf /var/lib/apt/lists/*
+    && docker-php-ext-enable mongodb
 
 # Enable Apache mod_rewrite
 RUN a2enmod rewrite
@@ -27,13 +25,13 @@ RUN a2enmod rewrite
 # Set working directory
 WORKDIR /var/www/html
 
-# Copy application source
-COPY . .
+# Copy project files
+COPY . /var/www/html
 
-# Copy vendor from Composer stage
+# Copy vendor folder dari stage vendor
 COPY --from=vendor /app/vendor /var/www/html/vendor
 
-# Apache virtual host config for Laravel
+# Apache config untuk Laravel (pointing ke /public)
 RUN echo '<VirtualHost *:80>\n\
     DocumentRoot /var/www/html/public\n\
     <Directory /var/www/html/public>\n\
@@ -42,7 +40,7 @@ RUN echo '<VirtualHost *:80>\n\
     </Directory>\n\
 </VirtualHost>' > /etc/apache2/sites-available/000-default.conf
 
-# Fix permissions
+# Permissions
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html
 
