@@ -4,23 +4,21 @@ FROM composer:2 AS vendor
 WORKDIR /app
 COPY composer.json composer.lock ./
 
-# Install semua dependency Laravel termasuk laravel-mongodb
-RUN composer require mongodb/laravel-mongodb \
-    && composer install --no-dev --optimize-autoloader --prefer-dist --no-progress --no-interaction
+# Install semua dependency Laravel
+RUN composer install --no-dev --optimize-autoloader --prefer-dist --no-progress --no-interaction \
+    && composer require mongodb/laravel-mongodb --no-progress --no-interaction
 
 # Stage 2: PHP + Apache
 FROM php:8.2-apache
 
-# Install system dependencies & PHP extensions
+# Install dependencies
 RUN apt-get update && apt-get install -y \
     git curl unzip zip libzip-dev libonig-dev libxml2-dev libpng-dev libjpeg-dev libfreetype6-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install pdo pdo_mysql zip bcmath intl gd \
     && pecl install mongodb \
-    && docker-php-ext-enable mongodb
-
-# Enable Apache mod_rewrite
-RUN a2enmod rewrite
+    && docker-php-ext-enable mongodb \
+    && a2enmod rewrite
 
 # Set working directory
 WORKDIR /var/www/html
